@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary warm colors -->
+    <color name="primaryColor">#FFA07A</color> <!-- Soft Orange -->
+    <color name="primaryLightColor">#FFD1B3</color> <!-- Lighter Orange -->
+    <color name="primaryDarkColor">#FF7F50</color> <!-- Dark Orange -->
+
+    <!-- Secondary colors -->
+    <color name="secondaryColor">#93C572</color> <!-- Pista Green -->
+    <color name="secondaryLightColor">#B7E3A2</color>
+    <color name="secondaryDarkColor">#6EA049</color>
+
+    <!-- Background & surface -->
+    <color name="backgroundColor">#FFF5E1</color> <!-- Light Cream -->
+    <color name="surfaceColor">#FFFFFF</color> <!-- White for cards -->
+
+    <!-- Text colors -->
+    <color name="textPrimary">#4B3832</color> <!-- Dark Brown -->
+    <color name="textSecondary">#7D5A50</color> <!-- Medium Brown -->
+    <color name="textOnPrimary">#FFFFFF</color>
+    <color name="textOnSecondary">#FFFFFF</color>
+
+    <!-- Accent / buttons -->
+    <color name="accentColor">#FFB347</color> <!-- Soft Orange Accent -->
+
+    <!-- Optional: divider / hint -->
+    <color name="dividerColor">#E0D7C6</color>
+    <color name="hintColor">#A39385</color>
+
+    <color name="green">#4CAF50</color>
+    <color name="red">#F44336</color>
+    <color name="blue">#2196F3</color>
+
+</resources>
