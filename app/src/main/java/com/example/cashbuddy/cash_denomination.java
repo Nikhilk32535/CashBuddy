@@ -1,6 +1,7 @@
 package com.example.cashbuddy;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Spannable;
@@ -28,9 +29,11 @@ public class cash_denomination extends Fragment {
     private TextInputEditText etSystemCash;
     private TextView tvTotalAndDiff;
     private LinearLayout llDenominations;
-    private ImageButton btnReload,btnShare;
+    private ImageButton btnReload, btnShare;
     private Map<Integer, TextInputEditText> denominationInputs = new HashMap<>();
     private int[] denominations = {500, 200, 100, 50, 20, 10, 5, 2, 1};
+    private SharedPreferences prefs;
+    private boolean isLoadingData = false; // flag to prevent saving while loading
 
     @Nullable
     @Override
@@ -49,6 +52,8 @@ public class cash_denomination extends Fragment {
         btnReload = view.findViewById(R.id.btnReload);
         btnShare = view.findViewById(R.id.btnShare);
 
+        prefs = requireContext().getSharedPreferences("CashBuddyPrefs", getContext().MODE_PRIVATE);
+
         // Dynamically add denomination cards
         for (int denom : denominations) {
             View card = LayoutInflater.from(getContext()).inflate(R.layout.item_denomination_card, llDenominations, false);
@@ -61,34 +66,39 @@ public class cash_denomination extends Fragment {
 
             // Scroll to focused input
             etCount.setOnFocusChangeListener((v, hasFocus) -> {
-                if (hasFocus) {
-                    llDenominations.post(() -> llDenominations.scrollTo(0, v.getTop()));
-                }
+                if (hasFocus) llDenominations.post(() -> llDenominations.scrollTo(0, v.getTop()));
             });
 
-            // Live calculation
+            // TextWatcher for live calculation & saving
             etCount.addTextChangedListener(new SimpleTextWatcher() {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     calculateTotalAndDifference();
+                    saveData();
                 }
             });
         }
 
-        // System cash input live calculation
+        // System cash live calculation & save
         etSystemCash.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 calculateTotalAndDifference();
+                saveData();
             }
         });
+
+        // Load saved data after all inputs are initialized
+        loadData();
 
         // Reload button clears all
         btnReload.setOnClickListener(v -> resetAllInputs());
 
-        sharebtn(btnShare);
+        // Share button
+        setupShareButton(btnShare);
     }
 
+    // ---------------- Calculate total and difference ----------------
     private void calculateTotalAndDifference() {
         int totalCash = 0;
 
@@ -124,33 +134,57 @@ public class cash_denomination extends Fragment {
         tvTotalAndDiff.setText(spannable);
     }
 
+    // ---------------- Reset inputs and clear saved data ----------------
     private void resetAllInputs() {
         etSystemCash.setText("");
-        for (TextInputEditText et : denominationInputs.values()) {
-            et.setText("");
-        }
+        for (TextInputEditText et : denominationInputs.values()) et.setText("");
         tvTotalAndDiff.setText("Total: ₹0 | Difference: ₹0");
         tvTotalAndDiff.setTextColor(getResources().getColor(R.color.textPrimary));
+        prefs.edit().clear().apply();
     }
 
     // ---------------- SimpleTextWatcher helper class ----------------
     public abstract static class SimpleTextWatcher implements TextWatcher {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-        @Override
-        public void afterTextChanged(Editable s) { }
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        @Override public void afterTextChanged(Editable s) { }
     }
 
+    // ---------------- Save and load data using SharedPreferences ----------------
+    private void saveData() {
+        if (isLoadingData) return; // do not save while loading
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("systemCash", etSystemCash.getText().toString());
+
+        for (int denom : denominations) {
+            TextInputEditText et = denominationInputs.get(denom);
+            String count = (et != null) ? et.getText().toString() : "0";
+            editor.putString("denom_" + denom, count);
+        }
+
+        editor.apply();
+    }
+
+    private void loadData() {
+        isLoadingData = true; // prevent overwriting while loading
+
+        etSystemCash.setText(prefs.getString("systemCash", ""));
+        for (int denom : denominations) {
+            TextInputEditText et = denominationInputs.get(denom);
+            if (et != null) et.setText(prefs.getString("denom_" + denom, ""));
+        }
+
+        calculateTotalAndDifference();
+        isLoadingData = false;
+    }
+
+    // ---------------- Generate Share Text ----------------
     private String generateShareText() {
         StringBuilder sb = new StringBuilder();
 
-        // Get current date and time
         String currentDateTime = java.text.DateFormat.getDateTimeInstance().format(new java.util.Date());
         sb.append("🕒 *Cash Report*: ").append(currentDateTime).append("\n\n");
-
         sb.append("💵 *Cash Denomination Summary* 💵\n\n");
-
-        // Header for denominations
         sb.append("Denomination | Count | Total\n");
         sb.append("---------------------------\n");
 
@@ -164,9 +198,7 @@ public class cash_denomination extends Fragment {
                 try { count = Integer.parseInt(et.getText().toString()); }
                 catch (NumberFormatException e) { count = 0; }
             }
-
-            if (count == 0) continue; // Skip zero-count denominations
-
+            if (count == 0) continue;
             hasAnyDenom = true;
             int subTotal = denom * count;
             totalCash += subTotal;
@@ -176,31 +208,23 @@ public class cash_denomination extends Fragment {
                     .append("       = ₹").append(subTotal).append("\n");
         }
 
-        if (!hasAnyDenom) {
-            sb.append("No denominations entered.\n");
-        }
+        if (!hasAnyDenom) sb.append("No denominations entered.\n");
 
-        // Get system cash
         int systemCash = 0;
         if (!etSystemCash.getText().toString().isEmpty()) {
             try { systemCash = Integer.parseInt(etSystemCash.getText().toString()); }
             catch (NumberFormatException e) { systemCash = 0; }
         }
 
-        // Append Total Cash
         sb.append("\n*Total Cash:* ₹").append(totalCash);
 
-        // Append System Cash and Difference only if System Cash > 0
         if (systemCash > 0) {
             int difference = totalCash - systemCash;
             sb.append("\n*System Cash:* ₹").append(systemCash)
                     .append("\n*Difference:* ₹").append(difference);
 
-            if (difference != 0) {
-                sb.append("\n\n⚠️ Difference detected! Please verify.");
-            } else {
-                sb.append("\n\n✅ Everything matches!");
-            }
+            if (difference != 0) sb.append("\n\n⚠️ Difference detected! Please verify.");
+            else sb.append("\n\n✅ Everything matches!");
         } else {
             sb.append("\n\n✅ No system cash entered.");
         }
@@ -208,8 +232,8 @@ public class cash_denomination extends Fragment {
         return sb.toString();
     }
 
-    private void sharebtn(ImageButton btnShare){
-
+    // ---------------- Setup Share Button ----------------
+    private void setupShareButton(ImageButton btnShare) {
         btnShare.setOnClickListener(v -> {
             View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_share_options, null);
             androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
@@ -239,7 +263,5 @@ public class cash_denomination extends Fragment {
 
             dialog.show();
         });
-
     }
-
 }
