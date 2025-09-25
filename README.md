@@ -32,7 +32,7 @@ You can download the latest version of CashBuddy here:
 ## Screenshots
 
 <!-- Main Screen -->
-<img src="https://github.com/user-attachments/assets/d4397e2b-efbd-4f86-ad0d-249676c22f8a/300x600.png?text=Main+Screen" alt="Main Screen" width="300" height="600">
+<img src="https://github.com/user-attachments/assets/d4397e2b-efbd-4f86-ad0d-249676c22f8a" alt="Main Screen" width="300" height="600">
 
 <!-- Share Options -->
 <img src="https://github.com/user-attachments/assets/d9d759ed-a7a0-4056-995f-8c3d4efb2ace" alt="Share Options" width="300" height="600">
