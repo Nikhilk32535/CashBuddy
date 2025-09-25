@@ -86,15 +86,7 @@ public class cash_denomination extends Fragment {
         // Reload button clears all
         btnReload.setOnClickListener(v -> resetAllInputs());
 
-        btnShare.setOnClickListener(v -> {
-            String shareText = generateShareText();
-
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("text/plain");
-            intent.putExtra(Intent.EXTRA_TEXT, shareText);
-            startActivity(Intent.createChooser(intent, "Share via"));
-        });
-
+        sharebtn(btnShare);
     }
 
     private void calculateTotalAndDifference() {
@@ -216,5 +208,38 @@ public class cash_denomination extends Fragment {
         return sb.toString();
     }
 
+    private void sharebtn(ImageButton btnShare){
+
+        btnShare.setOnClickListener(v -> {
+            View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_share_options, null);
+            androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setView(dialogView)
+                    .create();
+
+            LinearLayout llShareCash = dialogView.findViewById(R.id.llShareCash);
+            LinearLayout llShareApp = dialogView.findViewById(R.id.llShareApp);
+
+            llShareCash.setOnClickListener(view -> {
+                String shareText = generateShareText();
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, shareText);
+                startActivity(Intent.createChooser(intent, "Share via"));
+                dialog.dismiss();
+            });
+
+            llShareApp.setOnClickListener(view -> {
+                String appLink = "https://github.com/Nikhilk32535/CashBuddy";
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_TEXT, "Check out this CashBuddy app: " + appLink);
+                startActivity(Intent.createChooser(intent, "Share via"));
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        });
+
+    }
 
 }

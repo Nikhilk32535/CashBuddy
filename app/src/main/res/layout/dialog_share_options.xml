@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_dialog_bg">
+
+    <TextView
+        android:id="@+id/tvDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Share Option"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:paddingBottom="12dp"
+        android:gravity="center"
+        android:textColor="@color/textPrimary"/>
+
+    <LinearLayout
+        android:id="@+id/llShareCash"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_cash"
+            android:tint="@color/primaryColor"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share Tally Cash"
+            android:layout_marginStart="12dp"
+            android:textSize="16sp"
+            android:textColor="@color/textPrimary"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llShareApp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="8dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_link"
+            android:tint="@color/primaryColor"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share App Link"
+            android:layout_marginStart="12dp"
+            android:textSize="16sp"
+            android:textColor="@color/textPrimary"/>
+    </LinearLayout>
+</LinearLayout>
