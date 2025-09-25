@@ -31,9 +31,10 @@ You can download the latest version of CashBuddy here:
 
 ## Screenshots
 
-![Main Screen](![WhatsApp Image 2025-09-25 at 15 13 14_49a5b8ff](https://github.com/user-attachments/assets/d4397e2b-efbd-4f86-ad0d-249676c22f8a/300x600.png?text=Main+Screen)
+![Main Screen](https://github.com/user-attachments/assets/d4397e2b-efbd-4f86-ad0d-249676c22f8a/300x600.png?text=Main+Screen)
 
-![Share Options](https://via.placeholder.com/300x600.png?text=Share+Options)
+![Share Options](https://github.com/user-attachments/assets/d9d759ed-a7a0-4056-995f-8c3d4efb2ace)
+
 
 ---
 
