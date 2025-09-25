@@ -21,7 +21,7 @@
 ## Download APK
 
 You can download the latest version of CashBuddy here:  
-[Download CashBuddy APK](https://github.com/Nikhilk32535/CashBuddy/releases/latest/download/CashBuddy.apk)
+[Download CashBuddy APK](https://github.com/Nikhilk32535/CashBuddy/releases/download/v1.0/CashBuddy.apk)
 
 ---
 
