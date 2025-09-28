@@ -20,6 +20,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -58,12 +59,8 @@ public class cash_denomination extends Fragment {
         btnGoStockregister=view.findViewById(R.id.btnGostockregister);
 
         btnGoStockregister.setOnClickListener(v -> {
-            Stock_register_format fragment = new Stock_register_format();
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, fragment)
-                    .addToBackStack(null)
-                    .commit();
+            NavHostFragment.findNavController(this)
+                    .navigate(R.id.stockRegisterFragment);
         });
 
 
@@ -78,6 +75,14 @@ public class cash_denomination extends Fragment {
             TextInputEditText etCount = card.findViewById(R.id.etCount);
             TextView tvSubTotal = card.findViewById(R.id.tvSubTotal);
 
+            if (etCount != null) {
+                int value = prefs.getInt("denom_" + denom, -1);
+                if (value > 0) {
+                    etCount.setText(String.valueOf(value));
+                } else {
+                    etCount.setHint(""); // optional hint
+                }
+            }
             tvDenom.setText("₹" + denom);
             llDenominations.addView(card);
             denominationInputs.put(denom, etCount);
@@ -92,26 +97,15 @@ public class cash_denomination extends Fragment {
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     int enteredCount = 0;
-                    try {
-                        enteredCount = Integer.parseInt(s.toString());
-                    } catch (NumberFormatException ignored) {}
-
+                    try { enteredCount = Integer.parseInt(s.toString()); } catch (NumberFormatException ignored) {}
                     int subTotal = denom * enteredCount;
                     tvSubTotal.setText("= ₹" + NumberUtils.formatIndianNumber(subTotal));
 
                     calculateTotalAndDifference();
-                }
-            });
-
-
-            // TextWatcher for live calculation & saving
-            etCount.addTextChangedListener(new SimpleTextWatcher() {
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    calculateTotalAndDifference();
                     saveData();
                 }
             });
+
         }
 
 
@@ -123,9 +117,6 @@ public class cash_denomination extends Fragment {
                 saveData();
             }
         });
-
-        // Load saved data after all inputs are initialized
-        loadData();
 
         // Reload button clears all
         btnReload.setOnClickListener(v -> resetAllInputs());
@@ -159,15 +150,17 @@ public class cash_denomination extends Fragment {
         SpannableString spannable = new SpannableString(text);
 
         int diffStart = text.indexOf("₹" + difference);
-        int diffEnd = diffStart + ("₹" + difference).length();
+        if (diffStart >= 0) {
+            int diffEnd = diffStart + ("₹" + difference).length();
 
-        int color;
-        if (difference > 0) color = getResources().getColor(R.color.green);
-        else if (difference < 0) color = getResources().getColor(R.color.red);
-        else color = getResources().getColor(R.color.blue);
+            int color;
+            if (difference > 0) color = getResources().getColor(R.color.green);
+            else if (difference < 0) color = getResources().getColor(R.color.red);
+            else color = getResources().getColor(R.color.blue);
 
-        spannable.setSpan(new ForegroundColorSpan(color), diffStart, diffEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tvTotalAndDiff.setText(spannable);
+            spannable.setSpan(new ForegroundColorSpan(color), diffStart, diffEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            tvTotalAndDiff.setText(spannable);
+        }
     }
 
     // ---------------- Reset inputs and clear saved data ----------------
@@ -187,32 +180,28 @@ public class cash_denomination extends Fragment {
 
     // ---------------- Save and load data using SharedPreferences ----------------
     private void saveData() {
-        if (isLoadingData) return; // do not save while loading
+        if (isLoadingData) return;
 
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("systemCash", etSystemCash.getText().toString());
+        try {
+            editor.putInt("systemCash", Integer.parseInt(etSystemCash.getText().toString()));
+        } catch (NumberFormatException e) {
+            editor.putInt("systemCash", 0);
+        }
 
         for (int denom : denominations) {
             TextInputEditText et = denominationInputs.get(denom);
-            String count = (et != null) ? et.getText().toString() : "0";
-            editor.putString("denom_" + denom, count);
+            int count = 0;
+            if (et != null && !et.getText().toString().isEmpty()) {
+                try { count = Integer.parseInt(et.getText().toString()); }
+                catch (NumberFormatException ignored) {}
+            }
+            editor.putInt("denom_" + denom, count);
         }
 
         editor.apply();
     }
 
-    private void loadData() {
-        isLoadingData = true; // prevent overwriting while loading
-
-        etSystemCash.setText(prefs.getString("systemCash", ""));
-        for (int denom : denominations) {
-            TextInputEditText et = denominationInputs.get(denom);
-            if (et != null) et.setText(prefs.getString("denom_" + denom, ""));
-        }
-
-        calculateTotalAndDifference();
-        isLoadingData = false;
-    }
 
     // ---------------- Generate Share Text ----------------
     private String generateShareText() {
@@ -300,5 +289,6 @@ public class cash_denomination extends Fragment {
             dialog.show();
         });
     }
+
 
 }
