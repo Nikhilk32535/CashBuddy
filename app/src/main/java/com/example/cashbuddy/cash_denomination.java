@@ -1,5 +1,7 @@
 package com.example.cashbuddy;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.HashMap;
@@ -34,6 +37,7 @@ public class cash_denomination extends Fragment {
     private int[] denominations = {500, 200, 100, 50, 20, 10, 5, 2, 1};
     private SharedPreferences prefs;
     private boolean isLoadingData = false; // flag to prevent saving while loading
+    MaterialButton btnGoStockregister;
 
     @Nullable
     @Override
@@ -51,6 +55,19 @@ public class cash_denomination extends Fragment {
         llDenominations = view.findViewById(R.id.llDenominations);
         btnReload = view.findViewById(R.id.btnReload);
         btnShare = view.findViewById(R.id.btnShare);
+        btnGoStockregister=view.findViewById(R.id.btnGostockregister);
+
+        btnGoStockregister.setOnClickListener(v -> {
+            Stock_register_format fragment = new Stock_register_format();
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
+
+
+
 
         prefs = requireContext().getSharedPreferences("CashBuddyPrefs", getContext().MODE_PRIVATE);
 
@@ -59,6 +76,7 @@ public class cash_denomination extends Fragment {
             View card = LayoutInflater.from(getContext()).inflate(R.layout.item_denomination_card, llDenominations, false);
             TextView tvDenom = card.findViewById(R.id.tvDenomination);
             TextInputEditText etCount = card.findViewById(R.id.etCount);
+            TextView tvSubTotal = card.findViewById(R.id.tvSubTotal);
 
             tvDenom.setText("₹" + denom);
             llDenominations.addView(card);
@@ -69,6 +87,23 @@ public class cash_denomination extends Fragment {
                 if (hasFocus) llDenominations.post(() -> llDenominations.scrollTo(0, v.getTop()));
             });
 
+
+            etCount.addTextChangedListener(new SimpleTextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    int enteredCount = 0;
+                    try {
+                        enteredCount = Integer.parseInt(s.toString());
+                    } catch (NumberFormatException ignored) {}
+
+                    int subTotal = denom * enteredCount;
+                    tvSubTotal.setText("= ₹" + NumberUtils.formatIndianNumber(subTotal));
+
+                    calculateTotalAndDifference();
+                }
+            });
+
+
             // TextWatcher for live calculation & saving
             etCount.addTextChangedListener(new SimpleTextWatcher() {
                 @Override
@@ -78,6 +113,7 @@ public class cash_denomination extends Fragment {
                 }
             });
         }
+
 
         // System cash live calculation & save
         etSystemCash.addTextChangedListener(new SimpleTextWatcher() {
@@ -119,14 +155,14 @@ public class cash_denomination extends Fragment {
         }
 
         int difference = totalCash - systemCash;
-        String text = "Total: ₹" + totalCash + " | Difference: ₹" + difference;
+        String text = "Total: ₹" + NumberUtils.formatIndianNumber(totalCash) + " | Difference: ₹" + difference;
         SpannableString spannable = new SpannableString(text);
 
         int diffStart = text.indexOf("₹" + difference);
         int diffEnd = diffStart + ("₹" + difference).length();
 
         int color;
-        if (difference == 0) color = getResources().getColor(R.color.green);
+        if (difference > 0) color = getResources().getColor(R.color.green);
         else if (difference < 0) color = getResources().getColor(R.color.red);
         else color = getResources().getColor(R.color.blue);
 
@@ -264,4 +300,5 @@ public class cash_denomination extends Fragment {
             dialog.show();
         });
     }
+
 }

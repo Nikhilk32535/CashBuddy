@@ -3,45 +3,45 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
-    android:layout_marginBottom="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="6dp"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
     app:strokeColor="@color/primaryColor"
     app:strokeWidth="1dp"
+    android:padding="8dp"
     android:backgroundTint="@android:color/transparent">
 
-    <!-- Background gradient -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="40dp"
-        android:paddingEnd="40dp"
+        android:paddingHorizontal="16dp"
         android:background="@drawable/bg_card_gradient">
 
         <!-- Denomination Text -->
         <TextView
             android:id="@+id/tvDenomination"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="₹500"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textColor="@color/textPrimary"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:paddingVertical="8dp"/>
 
         <!-- Count Input -->
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="100dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:hint="Count"
+            android:layout_marginStart="12dp"
             app:boxBackgroundMode="outline"
-            app:boxCornerRadiusTopStart="8dp"
-            app:boxCornerRadiusTopEnd="8dp"
-            app:boxCornerRadiusBottomStart="8dp"
-            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxCornerRadiusTopStart="6dp"
+            app:boxCornerRadiusTopEnd="6dp"
+            app:boxCornerRadiusBottomStart="6dp"
+            app:boxCornerRadiusBottomEnd="6dp"
             app:boxStrokeColor="@color/primaryColor">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -49,11 +49,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="number"
+                android:gravity="center"
                 android:textColor="@color/textPrimary"
-                android:textSize="16sp"
-                android:gravity="center"/>
+                android:textSize="15sp"/>
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Total per denomination -->
+        <TextView
+            android:id="@+id/tvSubTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="= ₹0"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/primaryColor"/>
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

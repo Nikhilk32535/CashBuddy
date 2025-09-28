@@ -105,4 +105,17 @@
         </LinearLayout>
     </ScrollView>
 
+    <!-- Navigate to Second Fragment Button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGostockregister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Go to Stock register format"
+        android:textAllCaps="false"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
+        app:cornerRadius="12dp"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"/>
 </LinearLayout>
